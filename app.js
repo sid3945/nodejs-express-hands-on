@@ -28,7 +28,6 @@ tourRouter
     .get(getAllTours)
     .post(createTour);
 //we write / because we are already in the /api/v1/tours route as tourRouter middleware is mounted on it
-
 tourRouter
     .route('/:id')
     .get(getTour)
