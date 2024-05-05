@@ -8,7 +8,7 @@ userRouter = express.Router();
 
 app.use(express.json()); //middleware; to modify the incoming data
 
-app.use((req, res, next)=>{
+/**app.use((req, res, next)=>{
     console.log('Hello from the middleware, middleware stack strictly follows the order of the code while being executed');
     req.requestTime = new Date().toISOString();
     next();
@@ -18,37 +18,11 @@ app.use((req, res, next)=>{
     console.log('Hello from the second middleware');
     console.log(req);
     next();
-});
+}); */
 
 const hotels = JSON.parse(fs.readFileSync(`${__dirname}/dev-data/data.json`, 'utf-8'));
+const users = JSON.parse(fs.readFileSync(`${__dirname}/dev-data/users.json`, 'utf-8'));
 
-
-tourRouter
-    .route('/')
-    .get(getAllTours)
-    .post(createTour);
-//we write / because we are already in the /api/v1/tours route as tourRouter middleware is mounted on it
-tourRouter
-    .route('/:id')
-    .get(getTour)
-    .patch(updateTour)
-    .delete(deleteTour);
-
-userRouter
-    .route('/')
-    .get(getAllUsers)
-    .post(createUser);
-
-userRouter
-    .route('/:id')
-    .get(getUser)
-    .patch(updateUser)
-    .delete(deleteUser);
-
-
-app.use('/api/v1/tours', tourRouter); //mounting the app over the tourRouter middleware
-    /**so we are using the middleware called tourRouter for the route '/api/v1/tours' */
-app.use('/api/v1/users', userRouter);
 
 getAllHotels = (req, res)=>{
     res.status(200).json({
@@ -139,6 +113,163 @@ app.route('/api/v1/hotels/:id')
 .patch(updateHotel);
 
 //in essence we have separated the handler functions of the routes from the routes
+
+// User handlers
+getUser = (req, res) => {
+    const id = parseInt(req.params.id);
+    const user = users.find(el => el.id === id);
+
+    if(id > users.length || !user){
+        return res.status(404).json({
+            status: 'fail',
+            message: 'Invalid ID'
+        });
+    }
+
+    res.status(200).json({
+        status: 'success',
+        data: {
+            user: user
+        }
+    });
+};
+
+updateUser = (req, res) => {
+    if(req.params.id > users.length){
+        return res.status(404).json({
+            status: 'fail',
+            message: 'Invalid ID'
+        });
+    }
+    res.status(200).json({
+        status: 'success',
+        data: {
+            user: 'Updated user'
+        }
+    });
+};
+
+deleteUser = (req, res) => {
+    // Implement your delete logic here
+};
+
+getAllUsers = (req, res) => {
+    res.status(200).json({
+        status: 'success',
+        data: {
+            users: users
+        }
+    });
+};
+
+createUser = (req, res) => {
+    const newId = users[users.length-1].id + 1;
+    const newUser = {
+        id: newId,
+        ...req.body
+    };
+    users.push(newUser);
+    fs.writeFile(`${__dirname}/dev-data/data.json`, JSON.stringify(users), err =>{
+        res.status(201).json({
+            status: 'success',
+            data: {
+                users: "updated the new user"
+            }
+        });
+    });
+};
+
+// Tour handlers
+getTour = (req, res) => {
+    const id = parseInt(req.params.id);
+    const tour = tours.find(el => el.id === id);
+
+    if(id > tours.length || !tour){
+        return res.status(404).json({
+            status: 'fail',
+            message: 'Invalid ID'
+        });
+    }
+
+    res.status(200).json({
+        status: 'success',
+        data: {
+            tour: tour
+        }
+    });
+};
+
+updateTour = (req, res) => {
+    if(req.params.id > tours.length){
+        return res.status(404).json({
+            status: 'fail',
+            message: 'Invalid ID'
+        });
+    }
+    res.status(200).json({
+        status: 'success',
+        data: {
+            tour: 'Updated tour'
+        }
+    });
+};
+
+deleteTour = (req, res) => {
+    // Implement your delete logic here
+};
+
+getAllTours = (req, res) => {
+    res.status(200).json({
+        status: 'success',
+        data: {
+            tours: tours
+        }
+    });
+};
+
+createTour = (req, res) => {
+    const newId = tours[tours.length-1].id + 1;
+    const newTour = {
+        id: newId,
+        ...req.body
+    };
+    tours.push(newTour);
+    fs.writeFile(`${__dirname}/dev-data/data.json`, JSON.stringify(tours), err =>{
+        res.status(201).json({
+            status: 'success',
+            data: {
+                tours: "updated the new tour"
+            }
+        });
+    });
+};
+
+tourRouter
+    .route('/')
+    .get(getAllTours)
+    .post(createTour);
+//we write / because we are already in the /api/v1/tours route as tourRouter middleware is mounted on it
+tourRouter
+    .route('/:id')
+    .get(getTour)
+    .patch(updateTour)
+    .delete(deleteTour);
+
+userRouter
+    .route('/')
+    .get(getAllUsers)
+    .post(createUser);
+
+userRouter
+    .route('/:id')
+    .get(getUser)
+    .patch(updateUser)
+    .delete(deleteUser);
+
+
+app.use('/api/v1/tours', tourRouter); //mounting the app over the tourRouter middleware
+    /**so we are using the middleware called tourRouter for the route '/api/v1/tours' */
+app.use('/api/v1/users', userRouter);
 
 const port = 3000;
 app.listen(port, () => {
