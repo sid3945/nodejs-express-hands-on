@@ -3,22 +3,50 @@ const express = require('express');
 
 const app = express();
 
+app.use('/api/v1/tours', tourRouter); //mounting the app over the tourRouter middleware
+/**so we are using the middleware called tourRouter for the route '/api/v1/tours' */
+
+tourRouter = express.Router(); //creating a router from express this will go down multiple files
+
 app.use(express.json()); //middleware; to modify the incoming data
+
+app.use((req, res, next)=>{
+    console.log('Hello from the middleware, middleware stack strictly follows the order of the code while being executed');
+    req.requestTime = new Date().toISOString();
+    next();
+});
+
+app.use((req, res, next)=>{
+    console.log('Hello from the second middleware');
+    console.log(req);
+    next();
+});
 
 const hotels = JSON.parse(fs.readFileSync(`${__dirname}/dev-data/data.json`, 'utf-8'));
 
-console.log(typeof hotels);
 
-app.get('/api/v1/hotels', (req, res)=>{
+tourRouter
+    .route('/')
+    .get(getAllTours)
+    .post(createTour);
+//we write / because we are already in the /api/v1/tours route as tourRouter middleware is mounted on it
+
+tourRouter
+    .route('/:id')
+    .get(getTour)
+    .patch(updateTour)
+    .delete(deleteTour);
+
+getAllHotels = (req, res)=>{
     res.status(200).json({
         status: 'success',
         data: {
             hotels: hotels
         }
     });
-});
+};
 
-app.get('/api/v1/hotels/:id', (req, res)=>{
+getHotel = (req, res)=>{
     console.log(req.params);
     const id = parseInt(req.params.id);
     const hotel = hotels.find(el => el.id === id);
@@ -43,9 +71,9 @@ app.get('/api/v1/hotels/:id', (req, res)=>{
             hotel: hotel
         }
     });
-});
+};
 
-app.post('/api/v1/hotels', (req, res)=>{
+updateHotels = (req, res)=>{
     console.log(req.body);
     const newId = hotels[hotels.length-1].id + 1;
     const newHotel = {
@@ -61,11 +89,43 @@ app.post('/api/v1/hotels', (req, res)=>{
             }
         });
     });
-});
+};
 
-app.patch('/api/v1/hotels/:id', (req, res)=>{
-    
-})
+updateHotel= (req, res)=>{
+    if(req.params.id > hotels.length){
+        return res.status(404).json({
+            status: 'fail',
+            message: 'Invalid ID'
+        });
+    }
+    res.status(200).json({
+        status: 'success',
+        data: {
+            hotel: 'Updated hotel'
+        }
+    });
+};
+
+app.get('/api/v1/hotels', getAllHotels);
+
+app.get('/api/v1/hotels/:id', getHotel);
+
+app.post('/api/v1/hotels', updateHotels);
+
+app.patch('/api/v1/hotels/:id', updateHotel)
+
+
+// an even better way to write the above code is:
+
+app.route('/api/v1/hotels')
+.get(getAllHotels)
+.post(updateHotels);
+
+app.route('/api/v1/hotels/:id')
+.get(getHotel)
+.patch(updateHotel);
+
+//in essence we have separated the handler functions of the routes from the routes
 
 const port = 3000;
 app.listen(port, () => {
