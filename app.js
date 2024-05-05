@@ -117,10 +117,4 @@ app.use('/api/v1/tours', tourRouter); //mounting the app over the tourRouter mid
     /**so we are using the middleware called tourRouter for the route '/api/v1/tours' */
 app.use('/api/v1/users', userRouter);
 
-const port = 3000;
-app.listen(port, () => {
-    console.log(`
-    ----------------------------------
-    | Server is running on port ${port} |
-    ----------------------------------`);
-});
+module.exports = app; //exporting the app module to server file where the express will be started
