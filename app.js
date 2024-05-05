@@ -2,15 +2,12 @@ const fs = require('fs');
 const express = require('express');
 
 const app = express();
-
-app.use('/api/v1/tours', tourRouter); //mounting the app over the tourRouter middleware
-/**so we are using the middleware called tourRouter for the route '/api/v1/tours' */
-
-tourRouter = express.Router(); //creating a router from express this will go down multiple files
+const tourRouter  = require('./routes/tourRoutes');
+const userRouter = require('./routes/userRoutes'); //so we import router frm routes file and mount it over a specific route 
 
 app.use(express.json()); //middleware; to modify the incoming data
 
-app.use((req, res, next)=>{
+/**app.use((req, res, next)=>{
     console.log('Hello from the middleware, middleware stack strictly follows the order of the code while being executed');
     req.requestTime = new Date().toISOString();
     next();
@@ -20,22 +17,11 @@ app.use((req, res, next)=>{
     console.log('Hello from the second middleware');
     console.log(req);
     next();
-});
+}); */
 
 const hotels = JSON.parse(fs.readFileSync(`${__dirname}/dev-data/data.json`, 'utf-8'));
+const users = JSON.parse(fs.readFileSync(`${__dirname}/dev-data/users.json`, 'utf-8'));
 
-
-tourRouter
-    .route('/')
-    .get(getAllTours)
-    .post(createTour);
-//we write / because we are already in the /api/v1/tours route as tourRouter middleware is mounted on it
-
-tourRouter
-    .route('/:id')
-    .get(getTour)
-    .patch(updateTour)
-    .delete(deleteTour);
 
 getAllHotels = (req, res)=>{
     res.status(200).json({
@@ -124,13 +110,11 @@ app.route('/api/v1/hotels')
 app.route('/api/v1/hotels/:id')
 .get(getHotel)
 .patch(updateHotel);
-
 //in essence we have separated the handler functions of the routes from the routes
 
-const port = 3000;
-app.listen(port, () => {
-    console.log(`
-    ----------------------------------
-    | Server is running on port ${port} |
-    ----------------------------------`);
-});
+
+app.use('/api/v1/tours', tourRouter); //mounting the app over the tourRouter middleware
+    /**so we are using the middleware called tourRouter for the route '/api/v1/tours' */
+app.use('/api/v1/users', userRouter);
+
+module.exports = app; //exporting the app module to server file where the express will be started
