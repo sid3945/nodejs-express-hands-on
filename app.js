@@ -40,7 +40,6 @@ userRouter
     .get(getAllUsers)
     .post(createUser);
 
-
 userRouter
     .route('/:id')
     .get(getUser)
