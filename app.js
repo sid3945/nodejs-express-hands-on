@@ -3,10 +3,8 @@ const express = require('express');
 
 const app = express();
 
-app.use('/api/v1/tours', tourRouter); //mounting the app over the tourRouter middleware
-/**so we are using the middleware called tourRouter for the route '/api/v1/tours' */
-
 tourRouter = express.Router(); //creating a router from express this will go down multiple files
+userRouter = express.Router();
 
 app.use(express.json()); //middleware; to modify the incoming data
 
@@ -36,6 +34,23 @@ tourRouter
     .get(getTour)
     .patch(updateTour)
     .delete(deleteTour);
+
+userRouter
+    .route('/')
+    .get(getAllUsers)
+    .post(createUser);
+
+
+userRouter
+    .route('/:id')
+    .get(getUser)
+    .patch(updateUser)
+    .delete(deleteUser);
+
+
+app.use('/api/v1/tours', tourRouter); //mounting the app over the tourRouter middleware
+    /**so we are using the middleware called tourRouter for the route '/api/v1/tours' */
+app.use('/api/v1/users', userRouter);
 
 getAllHotels = (req, res)=>{
     res.status(200).json({
