@@ -3,7 +3,7 @@ const express = require('express');
 
 const app = express();
 
-tourRouter = express.Router(); //creating a router from express this will go down multiple files
+tourRouter = express.Router(); //creating a router middleware
 userRouter = express.Router();
 
 app.use(express.json()); //middleware; to modify the incoming data
