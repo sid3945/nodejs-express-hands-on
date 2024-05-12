@@ -1,6 +1,6 @@
-fs = require('fs');
+    fs = require('fs');
 
-
+const tours = JSON.parse(fs.readFileSync(`${__dirname}/../dev-data/tours.json`));
 // Tour handlers
 exports.getTour = (req, res) => {
     const id = parseInt(req.params.id);

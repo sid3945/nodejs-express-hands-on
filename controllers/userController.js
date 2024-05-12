@@ -1,5 +1,7 @@
 const fs = require('fs');
 
+const users = JSON.parse(fs.readFileSync(`${__dirname}/../dev-data/users.json`));
+
 // User handlers
 exports.getUser = (req, res) => {
     const id = parseInt(req.params.id);
@@ -64,3 +66,13 @@ exports.createUser = (req, res) => {
         });
     });
 };
+
+exports.validateUser = (req, res, next) => {
+    if(!req.body.name || !req.body.email){
+        return res.status(400).json({
+            status: 'fail',
+            message: 'Missing name or email'
+        });
+    }
+    next();
+}
