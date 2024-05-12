@@ -78,7 +78,7 @@ exports.validateUser = (req, res, next) => {
         });
     }
 
-    const userExists = users.some(user => user.name === name || user.email === email);
+    const userExists = users.some(user => user.email === email);
     if (userExists) {
         return res.status(409).json({
             status: 'fail',
