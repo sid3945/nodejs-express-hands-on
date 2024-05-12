@@ -57,7 +57,7 @@ exports.createUser = (req, res) => {
         ...req.body
     };
     users.push(newUser);
-    fs.writeFile(`${__dirname}/../dev-data/data.json`, JSON.stringify(users), err =>{
+    fs.writeFile(`${__dirname}/../dev-data/users.json`, JSON.stringify(users), err =>{
         res.status(201).json({
             status: 'success',
             data: {
@@ -68,12 +68,24 @@ exports.createUser = (req, res) => {
 };
 
 exports.validateUser = (req, res, next) => {
-    if(!req.body.name || !req.body.email){
+    console.log('in validateUser function the request is: ', req.body)
+    const { name, email } = req.body;
+
+    if (!name || !email) {
         return res.status(400).json({
             status: 'fail',
             message: 'Missing name or email'
         });
     }
+
+    const userExists = users.some(user => user.name === name || user.email === email);
+    if (userExists) {
+        return res.status(409).json({
+            status: 'fail',
+            message: 'User already exists'
+        });
+    }
+
     console.log('User is valid, verified by the first middleware');
     next();
 }
