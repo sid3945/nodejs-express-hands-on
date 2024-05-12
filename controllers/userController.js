@@ -74,5 +74,6 @@ exports.validateUser = (req, res, next) => {
             message: 'Missing name or email'
         });
     }
+    console.log('User is valid, verified by the first middleware');
     next();
 }
