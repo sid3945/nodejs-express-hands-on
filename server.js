@@ -35,6 +35,15 @@ const tourSchema = new mongoose.Schema({
 
 const Tour = mongoose.model('Tour', tourSchema);
 
+const testTour = new Tour({
+    name: 'The Park Camper',
+    price: 997
+}).save().then(doc => {
+    console.log(doc);
+}).catch(err => {
+    console.log('Error:', err);
+})
+//we are creating a new document in the collection testTour that is created from the model Tour whose schema is tourSchema
 
 const app = require('./app');
 
