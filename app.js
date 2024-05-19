@@ -72,7 +72,7 @@ updateHotels = (req, res)=>{
             status: 'success',
             data: {
                 hotels: "updated the new hotel"
-            }
+                }
         });
     });
 };
