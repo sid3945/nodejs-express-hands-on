@@ -1,6 +1,8 @@
     fs = require('fs');
+const Tour = require('../models/tourModel');
 
-const tours = JSON.parse(fs.readFileSync(`${__dirname}/../dev-data/tours.json`));
+//const tours = JSON.parse(fs.readFileSync(`${__dirname}/../dev-data/tours.json`)); commenting this bcz now we dont need dummy data from json
+
 // Tour handlers
 exports.getTour = (req, res) => {
     const id = parseInt(req.params.id);
